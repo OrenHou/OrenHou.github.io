@@ -1,0 +1,289 @@
+<!doctype html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>自定义Gradle插件 &middot; Oren&#39;s blog</title>
+        <meta name="author">
+        <meta name="description" content="The blog of Oren.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="generator" content="Hugo 0.71.0" />
+        
+        <link href='//fonts.googleapis.com/css?family=Roboto:400,300,700|Noto+Serif:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://orenhou.github.io/css/styles.css">
+        <link rel="icon" href="https://orenhou.github.io/favicon.ico">
+        <link rel="apple-touch-icon" href="https://orenhou.github.io/apple-touch-icon.png" />
+        <link rel="stylesheet" href="https://orenhou.github.io/css/highlightjs/monokai.css">
+        <script src="https://orenhou.github.io/js/vendor/modernizr-2.8.0.min.js"></script>
+        
+        <style>
+        .site-header h2 .logo {
+        background: url(https://orenhou.github.io/img/desk.jpg) no-repeat 0 0;
+        }
+        @media (min--moz-device-pixel-ratio: 1.3), (-o-min-device-pixel-ratio: 2.6 / 2), (-webkit-min-device-pixel-ratio: 1.3), (min-device-pixel-ratio: 1.3), (min-resolution: 1.3dppx) {
+          .site-header h2 .logo {
+            background-image: url(https://orenhou.github.io/img/desk.jpg);
+        }}
+       .site-header {
+         background: #2a373d url(https://orenhou.github.io/img/desk.jpg) no-repeat center center;
+         z-index: -1;
+        }
+        </style>
+    </head>
+    <body>
+        
+        <header class="site-header">
+          <div class="transparent-layer">
+              <h2>Oren&#39;s blog</h2>
+          </div>
+        </header>
+
+
+<div class="container clearfix">
+    <main role="main" class="content">
+        <article class="post">
+            <a class="btn home" href="https://orenhou.github.io/" title="主页">&laquo; 主页</a>
+            
+<h1><a href="https://orenhou.github.io/post/customgradleplugin/" title="自定义Gradle插件">自定义Gradle插件</a></h1>
+
+<footer class="post-info">发表于 <span class="post-meta"><time datetime="2020.05.26">2020.05.26</time>
+
+</span>
+</footer>
+
+            <h2 id="简介">简介:</h2>
+<blockquote>
+<p>自定义插件 + 自定义任务</p>
+</blockquote>
+<h2 id="准备">准备</h2>
+<h4 id="项目创建">项目创建：</h4>
+<blockquote>
+<p>创建一个项目,删除无用的文件夹，保留Src文件夹</p>
+</blockquote>
+<h2 id="引入">引入</h2>
+<h4 id="gradle引用">gradle引用：</h4>
+<pre><code>apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+    //gradle
+    implementation 'com.android.tools.build:gradle:3.5.3'
+
+}
+
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
+}
+</code></pre><h4 id="编写插件">编写插件</h4>
+<blockquote>
+<p>在 <strong>src</strong> 下创建文件夹 <strong>main</strong>&ndash;&gt;<strong>groovy</strong>&ndash;&gt;创建包名&ndash;&gt;<strong>com.atem.plugin</strong></p>
+</blockquote>
+<blockquote>
+<p>创建插件文件 PreparePackingPlugin.groovy</p>
+</blockquote>
+<pre><code>package com.atem.plugin
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class PreparePackingPlugin implements Plugin&lt;Project&gt; {
+
+    @Override
+    void apply(Project project) {
+        println &quot;-----PreparePackingPlugin Start-----&quot;
+    }
+}
+</code></pre><h4 id="注册插件">注册插件</h4>
+<blockquote>
+<p>在 <strong>main</strong> 文件夹下创建 <strong>resources</strong> 文件夹,在 <strong>resources</strong> 创建 <strong>META-INF.gradle-plugins</strong>,最后再创建 <strong>com.atem.plugin.properties</strong>。 在创建的文件中写入一下代码，指向刚刚创建的插件</p>
+</blockquote>
+<blockquote>
+<p>( <strong>com.atem.game</strong> 是自定义插件的包名)</p>
+</blockquote>
+<pre><code>implementation-class=com.atem.plugin.PreparePackingPlugin
+</code></pre><h4 id="插件上传">插件上传</h4>
+<blockquote>
+<p>在 <strong>build.gradle</strong> 文件中定义</p>
+</blockquote>
+<pre><code>uploadArchives {
+    repositories {
+        mavenDeployer {
+            //设置插件的GAV参数
+            //groupId(包名)
+            pom.groupId = 'com.atem.plugin'
+            //artifactId(引用的名称)
+            pom.artifactId = 'atemplugin'
+            //版本号
+            pom.version = '1.0.0'
+            //文件发布到下面目录(本地)
+            repository(url: uri('../AtemMaven'))
+        }
+    }
+}
+</code></pre><blockquote>
+<p>以上代码 <strong>sync</strong> 之后，会在gradle里面找到对应的任务</p>
+</blockquote>
+<blockquote>
+<p>plugin &ndash; Tasks &ndash; upload &ndash; uploadArchives</p>
+</blockquote>
+<blockquote>
+<p>双击就会执行上传到本地的操作，会在本地生成所需要的插件文件</p>
+</blockquote>
+<h4 id="引用插件">引用插件</h4>
+<blockquote>
+<p>在项目的根 <strong>build.gradle</strong> 文件填入</p>
+</blockquote>
+<pre><code>buildscript {
+    ......
+    repositories {
+        maven { url &quot;./AtemMaven&quot; }
+        ......
+    }
+    ......
+}
+</code></pre><pre><code>buildscript {
+    ......
+    dependencies {
+        classpath &quot;com.atem.plugin:atemplugin:1.0.0&quot;
+        ......
+    }
+    ......
+}
+</code></pre><blockquote>
+<p>在项目的 <strong>build.gradle</strong>文件下引入</p>
+</blockquote>
+<pre><code>apply plugin: 'com.atem.plugin'
+</code></pre><blockquote>
+<p>编译通过，插件内的信息就可以输出了</p>
+</blockquote>
+<pre><code>......
+
+&gt; Configure project :atem
+-----PreparePackingPlugin Start-----
+
+......
+</code></pre><h4 id="自定义插件任务">自定义插件任务</h4>
+<blockquote>
+<p>在 <strong>com.atem.plugin</strong> 包名下创建文件 <strong>EncryptTask.groovy</strong></p>
+</blockquote>
+<pre><code>package com.atem.plugin
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+
+class EncryptTask extends DefaultTask {
+
+    @TaskAction
+    void process() {
+        println &quot;&gt;&gt;&gt;&gt;&gt;EncryptTask Start&lt;&lt;&lt;&lt;&lt;&quot;
+    }
+}
+</code></pre><h4 id="自定义插件任务外部传参">自定义插件任务外部传参</h4>
+<blockquote>
+<p>定义类 <strong>Params</strong></p>
+</blockquote>
+<pre><code>public class Params {
+    String text = &quot;&quot;
+}
+</code></pre><h4 id="在任务中使用参数">在任务中使用参数</h4>
+<pre><code>package com.atem.plugin
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+
+class EncryptTask extends DefaultTask {
+
+    Params p = null
+
+    @TaskAction
+    void process() {
+        println &quot;&gt;&gt;&gt;&gt;&gt;EncryptTask Start&lt;&lt;&lt;&lt;&lt;&quot;
+        println &quot;${p.text}&quot;
+    }
+}
+</code></pre><h4 id="使用任务和任务参数">使用任务和任务参数</h4>
+<pre><code>//创建任务参数
+Params p = project.extensions.create(&quot;p&quot;, Params.class)
+//创建任务
+EncryptTask encryptTask = project.tasks.create(&quot;encryptTask&quot;, EncryptTask.class)
+//传参
+encryptTask.p = p
+//设置任务分组
+encryptTask.group = &quot;atem&quot;
+</code></pre><h4 id="在项目中定义任务参数">在项目中定义任务参数</h4>
+<pre><code>p{
+    text=&quot;encrypt outside params&quot;
+}
+</code></pre><blockquote>
+<p>插件每次改动，需要升级版本，再上传，引用的地方需要更改最新版本号来使用。</p>
+</blockquote>
+<blockquote>
+<p>所有改动完成，项目 <strong>sync</strong> 同步之后。会在引用项目的gradle下，找到对用的命令
+<strong>atem</strong> &ndash;&gt; <strong>encryptTask</strong>,双击即可运行，会看到控制台输出：</p>
+</blockquote>
+<pre><code>......
+
+&gt; Task :atem:encryptTask
+&gt;&gt;&gt;&gt;&gt;EncryptTask Start&lt;&lt;&lt;&lt;&lt;
+encrypt outside params
+
+......
+</code></pre>
+        </article>
+        
+        
+    </main>
+    <aside class="author">
+  <img class="profile-image" src="https://orenhou.github.io/img/profile-image.png" alt="Oren" width="130" height="130" />
+  <p class="name"> 
+  <strong>Oren</strong></p>
+  <p class="address"></p>
+  <p class="link"></p>
+  <ul class="social">
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<li><a href="//github.com/Hoxx" class="icon-github" target="_blank" title="Github"></a></li>
+
+
+
+  </ul>
+  <br><br>
+</aside>
+
+</div>
+
+<footer class="main-footer">
+  <div class="container clearfix">
+        <p>&copy; 2020 &middot; Oren</p>
+  </div>
+</footer>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script>window.jQuery || document.write('<script src="https:\/\/orenhou.github.io\/js\/vendor\/jquery-1.11.0.min.js"><\/script>')</script>
+<script src="https://orenhou.github.io/js/plugins.js"></script>
+
+
+
+
+</body>
+</html>
+
