@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Oren&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 26 May 2020 21:07:16 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 27 May 2020 15:07:11 +0800</lastBuildDate>
     
 	<atom:link href="https://orenhou.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ExoPlayer</title>
+      <link>https://orenhou.github.io/post/exoplayer/</link>
+      <pubDate>Wed, 27 May 2020 15:07:11 +0800</pubDate>
+      
+      <guid>https://orenhou.github.io/post/exoplayer/</guid>
+      <description>&lt;h2 id=&#34;简介&#34;&gt;简介:&lt;/h2&gt;
+&lt;p&gt;ExoPlayer是适用于Android的应用程序级媒体播放器。 它提供了Android MediaPlayer API的替代方法，可以在本地和通过Internet播放音频和视频。 ExoPlayer支持Android MediaPlayer API当前不支持的功能，包括DASH和SmoothStreaming自适应播放。 与MediaPlayer API不同，ExoPlayer易于自定义和扩展，可以通过Play商店应用程序更新进行更新。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>自定义Gradle插件</title>

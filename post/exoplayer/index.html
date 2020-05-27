@@ -1,0 +1,349 @@
+<!doctype html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>ExoPlayer &middot; Oren&#39;s blog</title>
+        <meta name="author">
+        <meta name="description" content="The blog of Oren.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="generator" content="Hugo 0.71.0" />
+        
+        <link href='//fonts.googleapis.com/css?family=Roboto:400,300,700|Noto+Serif:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://orenhou.github.io/css/styles.css">
+        <link rel="icon" href="https://orenhou.github.io/favicon.ico">
+        <link rel="apple-touch-icon" href="https://orenhou.github.io/apple-touch-icon.png" />
+        <link rel="stylesheet" href="https://orenhou.github.io/css/highlightjs/monokai.css">
+        <script src="https://orenhou.github.io/js/vendor/modernizr-2.8.0.min.js"></script>
+        
+        <style>
+        .site-header h2 .logo {
+        background: url(https://orenhou.github.io/img/desk.jpg) no-repeat 0 0;
+        }
+        @media (min--moz-device-pixel-ratio: 1.3), (-o-min-device-pixel-ratio: 2.6 / 2), (-webkit-min-device-pixel-ratio: 1.3), (min-device-pixel-ratio: 1.3), (min-resolution: 1.3dppx) {
+          .site-header h2 .logo {
+            background-image: url(https://orenhou.github.io/img/desk.jpg);
+        }}
+       .site-header {
+         background: #2a373d url(https://orenhou.github.io/img/desk.jpg) no-repeat center center;
+         z-index: -1;
+        }
+        </style>
+    </head>
+    <body>
+        
+        <header class="site-header">
+          <div class="transparent-layer">
+              <h2>Oren&#39;s blog</h2>
+          </div>
+        </header>
+
+
+<div class="container clearfix">
+    <main role="main" class="content">
+        <article class="post">
+            <a class="btn home" href="https://orenhou.github.io/" title="主页">&laquo; 主页</a>
+            
+<h1><a href="https://orenhou.github.io/post/exoplayer/" title="ExoPlayer">ExoPlayer</a></h1>
+
+<footer class="post-info">发表于 <span class="post-meta"><time datetime="2020.05.27">2020.05.27</time>
+
+</span>
+</footer>
+
+            <h2 id="简介">简介:</h2>
+<p>ExoPlayer是适用于Android的应用程序级媒体播放器。 它提供了Android MediaPlayer API的替代方法，可以在本地和通过Internet播放音频和视频。 ExoPlayer支持Android MediaPlayer API当前不支持的功能，包括DASH和SmoothStreaming自适应播放。 与MediaPlayer API不同，ExoPlayer易于自定义和扩展，可以通过Play商店应用程序更新进行更新。</p>
+<h2 id="引入">引入</h2>
+<h4 id="gradle引用">gradle引用：</h4>
+<pre><code>    implementation 'com.google.android.exoplayer:exoplayer:2.10.6'
+</code></pre><h4 id="coredash和ui库支持">Core、DASH和UI库支持</h4>
+<pre><code>implementation 'com.google.android.exoplayer:exoplayer-core:2.10.6'
+implementation 'com.google.android.exoplayer:exoplayer-dash:2.10.6'
+implementation 'com.google.android.exoplayer:exoplayer-ui:2.10.6'
+</code></pre><ul>
+<li>exoplayer-core：核心功能（必需）。</li>
+<li>exoplayer-dash：支持DASH内容。</li>
+<li>exoplayer-hls：支持HLS内容。</li>
+<li>exoplayer-smoothstreaming：支持SmoothStreaming内容。</li>
+<li>exoplayer-ui：用于ExoPlayer的UI组件和资源。</li>
+</ul>
+<h4 id="java-8支持">Java 8支持</h4>
+<pre><code>compileOptions {
+    targetCompatibility JavaVersion.VERSION_1_8 
+}
+</code></pre><h2 id="基本用法">基本用法</h2>
+<h4 id="创建播放器">创建播放器</h4>
+<p>可以使用 ExoPlayer创建实例 ExoPlayerFactory。这个工厂类提供了一系列方法来创建 ExoPlayer不同级别的自定义实例，必须从单个应用程序线程访问ExoPlayer实例。创建一个简单的例子：</p>
+<pre><code>SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(context);
+</code></pre><h4 id="设置播放器视图">设置播放器视图</h4>
+<p>ExoPlayer库提供了一个 PlayerView封装一个 PlayerControlView，一个 SubtitleView和一个 Surface的视图。将播放器绑定到视图：</p>
+<pre><code>player_view.setPlayer(exoPlayer);
+</code></pre><p>Exoplayer也可以设置其他的视频播放View:</p>
+<pre><code>void setVideoTextureView(TextureView textureView);
+void setVideoSurfaceView(SurfaceView surfaceView);
+void setVideoSurface(Surface surface);
+void setVideoSurfaceHolder(SurfaceHolder surfaceHolder);
+</code></pre><h4 id="创建播放源">创建播放源</h4>
+<p>在 ExoPlayer 中，每个媒体都由一个 MediaSource代表，要播放媒体文件，必须首先创建一个对应的 MediaSource，然后将此对象传递给 <strong>ExoPlayer.prepare(MediaSource)</strong> 方法。创建一个普通的MP4播放源：</p>
+<pre><code> DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(&quot;http://xxx.xxx.xxx/xxx.mp4&quot;));
+</code></pre><p>设置播放源</p>
+<pre><code>exoPlayer.prepare(mediaSource);
+</code></pre><p>设置视频准备好时直接播放</p>
+<pre><code>exoPlayer.setPlayWhenReady(true);
+</code></pre><h4 id="控制播放器">控制播放器</h4>
+<pre><code>//跳转
+void seekTo(int windowIndex, long positionMs);
+//循环
+void setRepeatMode(@RepeatMode int repeatMode);
+//调整播放速度和音量
+ void setPlaybackParameters(PlaybackParameters playbackParameters);
+ 
+</code></pre><h4 id="释放播放器">释放播放器</h4>
+<pre><code>void release();
+</code></pre><h4 id="事件监听">事件监听</h4>
+<pre><code>void addListener(Player.EventListener listener);
+</code></pre><p>监听事件</p>
+<pre><code>//播放状态改变
+default void onPlayerStateChanged(boolean playWhenReady, int playbackState) {}
+//播放失败监听
+default void onPlayerError(ExoPlaybackException error) {}
+</code></pre><p>其他事件回调</p>
+<pre><code>//监听详细事件，这些事件主要用于分析和报告
+void addAnalyticsListener(AnalyticsListener listener);
+//监听视频事件
+void addVideoListener(VideoListener listener);
+//监听音频事件
+void addAudioListener(AudioListener listener);
+//监听字幕事件
+void addTextOutput(TextOutput listener);
+</code></pre><p>日志输出</p>
+<pre><code>void addAnalyticsListener(new EventLogger(trackSelector));
+</code></pre><h4 id="mediasource">MediaSource</h4>
+<p>基础MediaSource</p>
+<pre><code>//常规资源
+ProgressiveMediaSource.class
+//DASH资源
+DashMediaSource.class
+//SmoothStreaming资源
+SsMediaSource.class
+//HLS资源
+HlsMediaSource.class
+</code></pre><p>高级MediaSource</p>
+<pre><code>//播放列表
+ConcatenatingMediaSource.class
+//裁切
+ClippingMediaSource.class
+//循环
+LoopingMediaSource.class
+//合并
+MergingMediaSource.class
+</code></pre><p>ConcatenatingMediaSource，播放列表MediaSource，支持动态修改和移动其中的MediaSource。</p>
+<pre><code>DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+ConcatenatingMediaSource mediaSource = new ConcatenatingMediaSource();
+for (String video : VideoData.videos) {
+    mediaSource.addMediaSource(new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(video)));
+}
+</code></pre><p>动态添加，删除和移动</p>
+<pre><code>//添加
+void addMediaSource(MediaSource mediaSource);
+void addMediaSources(Collection&lt;MediaSource&gt; mediaSources);
+void addMediaSource(int index, MediaSource mediaSource) ;
+//删除
+void removeMediaSource(int index);
+void removeMediaSourceRange(int fromIndex, int toIndex);
+//移动
+void moveMediaSource(int currentIndex, int newIndex)
+//全部清除
+void clear();
+</code></pre><p>ClippingMediaSource，剪辑MediaSource，可以选择性的播放其中的一段时间的视频</p>
+<pre><code>DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(VideoData.video));
+ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 5_000_000, 10_000_000);
+</code></pre><p>LoopingMediaSource，循环MediaSource，可以将视频无缝循环固定次数，默认为最大值：Integer.MAX_VALUE</p>
+<pre><code>DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+MediaSource mediaSource = new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(VideoData.video));
+LoopingMediaSource loopingMediaSource = new LoopingMediaSource(mediaSource);
+</code></pre><p>也可以组合使用多个MediaSource，整合两个视频，且第一个视频播放两次：</p>
+<pre><code>DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+MediaSource firstSource = new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(VideoData.videos[0]));
+MediaSource secondSource = new ProgressiveMediaSource.Factory(factory).createMediaSource(Uri.parse(VideoData.videos[1]));
+LoopingMediaSource firstSourceTwice = new LoopingMediaSource(firstSource, 2);
+ConcatenatingMediaSource concatenatedSource = new ConcatenatingMediaSource(firstSourceTwice, secondSource);
+</code></pre><h4 id="trackselector">TrackSelector</h4>
+<p>主要是确定播放器播放哪些可用的媒体曲目，音频轨道，视频轨道。</p>
+<h2 id="ui库">UI库</h2>
+<h4 id="playerview">PlayerView</h4>
+<p>内置的播放器View,此View含有 surface_type 属性，可以设置用于视频播放的Surface类型，主要包含：spherical_view（球形播放器），surface_view（SurfaceView）,texture_view（TextureView），none（没有播放器视图）。</p>
+<p>相比TextureView，SurfaceView有许多好处：</p>
+<ul>
+<li>显着降低了许多设备的功耗</li>
+<li>更准确的帧定时，使视频播放更流畅。</li>
+<li>播放受DRM保护的内容时支持安全输出</li>
+</ul>
+<p><strong>如果为了实现流畅的动画或视频滚动，必须使用TextureView。</strong></p>
+<h4 id="playercontrolview">PlayerControlView</h4>
+<p>内置的控制器View，可以使用<strong>controller_layout_id</strong>属性自定义控制布局。</p>
+<h2 id="高级用法">高级用法</h2>
+<h4 id="下载">下载</h4>
+<p>Exoplayer提供封装好的下载类库，可以简单的实现下载的需求。<br>
+继承 DownloadService ,创建一个下载的Service。</p>
+<pre><code>public class VideoDownloadService extends DownloadService {
+
+    public VideoDownloadService(int foregroundNotificationId) {
+        super(foregroundNotificationId);
+    }
+
+    @Override
+    protected DownloadManager getDownloadManager() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected Scheduler getScheduler() {
+        return null;
+    }
+
+    @Override
+    protected Notification getForegroundNotification(List&lt;Download&gt; downloads) {
+        return null;
+    }
+}
+</code></pre><p>需要实现一个DownloadManager的类，DownloadManager只需要创建出来，配置好固定的参数，具体的下载功能是Exoplayer自己提供的。<br>
+创建一个DownloadManager：</p>
+<pre><code>//构造方法
+DownloadManager(Context context, DatabaseProvider databaseProvider, Cache cache, Factory upstreamFactory)
+</code></pre><p>看构造方法知道，需要提供一个DatabaseProvider的数据库存储Provider，Cache的缓存实例，创建下载MediaSource的DataSource.Factory，代码实例：</p>
+<pre><code>/**
+ * 默认DatabaseProvider实现
+ */
+private DatabaseProvider getDatabaseProvider(Context context) {
+    if (databaseProvider == null) {
+        databaseProvider = new ExoDatabaseProvider(context);
+    }
+    return databaseProvider;
+}
+/**
+ * 下载缓存
+ */
+private synchronized Cache getDownloadCache(Context context) {
+    if (downloadCache == null) {
+        File downloadContentDirectory = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+        downloadCache = new SimpleCache(downloadContentDirectory, new NoOpCacheEvictor(), getDatabaseProvider(context));
+    }
+    return downloadCache;
+}
+
+/**
+ * 构建下载的DataSource.Factory
+ */
+private HttpDataSource.Factory buildHttpDataSourceFactory(Context context) {
+    return new DefaultHttpDataSourceFactory(Util.getUserAgent(context,context.getString(R.string.app_name)));
+}
+
+/**
+ * 创建DownloadManager
+ */
+public synchronized DownloadManager getDownloadManager(Context context) {
+    if (downloadManager == null) {
+        downloadManager = new DownloadManager(context,
+                getDatabaseProvider(context),
+                getDownloadCache(context),
+                buildHttpDataSourceFactory(context));
+        //下载进度需要满足的要求
+        downloadManager.setRequirements(new Requirements(Requirements.NETWORK));
+        //最大下载数
+        downloadManager.setMaxParallelDownloads(3);
+    }
+    return downloadManager;
+}
+</code></pre><h4 id="下载控制">下载控制</h4>
+<p>创建下载任务并开启下载：</p>
+<pre><code>//开始下载
+private void download(String url) {
+    DownloadRequest downloadRequest = DownloadHelper.forProgressive(Uri.parse(url)).getDownloadRequest(null);
+    DownloadService.sendAddDownload(mContext, VideoDownloadService.class, downloadRequest, false);
+}
+//移除下载
+private void stopDownload(String id) {
+    DownloadService.sendRemoveDownload(mContext, VideoDownloadService.class, id, false);
+}
+</code></pre><p>其他方法：</p>
+<pre><code>//如果尚未启动服务，则启动该服务，并暂停所有下载。
+DownloadService.sendPauseDownloads();
+//如果尚未启动，请启动该服务，然后继续所有下载。
+DownloadService.sendResumeDownloads();
+//启动尚未启动的服务，并设置一次或所有下载的停止原因
+DownloadService.sendSetStopReason();
+//如果尚未启动服务，则启动该服务并删除所有下载
+DownloadService.sendRemoveAllDownloads();
+//如果尚未启动服务，则启动该服务，并设置进行下载所需的要求
+DownloadService.sendSetRequirements();
+</code></pre><h4 id="边播放边缓存">边播放边缓存</h4>
+<pre><code>private MediaSource getMediaSource(String url) {
+    //创建缓存的文件夹
+    Cache downloadCache = new SimpleCache(getExternalFilesDir(Environment.DIRECTORY_MOVIES),new
+    NoOpCacheEvictor(),new ExoDatabaseProvider(this));
+    //创建写缓存数据的类
+    DataSink.Factory cacheWriteDataSinkFactory = new CacheDataSinkFactory(downloadCache, Long.MAX_VALUE);
+    //创建MediaSource的Factory
+    DataSource.Factory factory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, &quot;Demo&quot;));
+    //创建CacheDataSourceFactory
+    CacheDataSourceFactory cacheDataSourceFactory = new CacheDataSourceFactory(downloadCache, factory, new FileDataSourceFactory(), cacheWriteDataSinkFactory,CacheDataSource.FLAG_BLOCK_ON_CACHE | CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null);
+    return new ProgressiveMediaSource.Factory(cacheDataSourceFactory)
+            .createMediaSource(Uri.parse(url));
+}
+</code></pre><p>多个Player实例，不能同时操作同一个缓存目录！！！</p>
+        </article>
+        
+        
+    </main>
+    <aside class="author">
+  <img class="profile-image" src="https://orenhou.github.io/img/profile-image.png" alt="Oren" width="130" height="130" />
+  <p class="name"> 
+  <strong>Oren</strong></p>
+  <p class="address"></p>
+  <p class="link"></p>
+  <ul class="social">
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<li><a href="//github.com/OrenHou" class="icon-github" target="_blank" title="Github"></a></li>
+
+
+
+  </ul>
+  <br><br>
+</aside>
+
+</div>
+
+<footer class="main-footer">
+  <div class="container clearfix">
+        <p>&copy; 2020 &middot; Oren</p>
+  </div>
+</footer>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script>window.jQuery || document.write('<script src="https:\/\/orenhou.github.io\/js\/vendor\/jquery-1.11.0.min.js"><\/script>')</script>
+<script src="https://orenhou.github.io/js/plugins.js"></script>
+
+
+
+
+</body>
+</html>
+
